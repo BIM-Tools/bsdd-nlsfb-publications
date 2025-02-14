@@ -13,6 +13,17 @@ interface HoofdstukProps {
   activeItems: ClassListItemContractV1Classes[];
 }
 
+function getSearchUrl(classUrl: string) {
+  if (!classUrl) {
+    return;
+  }
+  if (classUrl.startsWith("https://identifier.buildingsmart.org/uri/")) {
+    return classUrl;
+  } else {
+    return `https://search.bsdd.buildingsmart.org/ext/class?uri=${encodeURIComponent(classUrl)}`;
+  }
+}
+
 function NlsfbCard({
   nlsfbClass,
   setActiveLevel,
@@ -62,18 +73,17 @@ function NlsfbCard({
       return;
     }
     window.open(
-      `https://search.bsdd.buildingsmart.org/ext/class?uri=${url}`,
+      `https://search.bsdd.buildingsmart.org/ext/class?uri=${encodeURIComponent(url)}`,
       "_blank"
     );
   };
 
   const handleBadgeClick = () => {
-    console.log(nlsfbClass);
     const url = nlsfbClass.uri;
     if (!url) {
       return;
     }
-    window.open(url, "_blank");
+    window.open(encodeURIComponent(url), "_blank");
   };
 
   const includeNames = activeItems
@@ -87,16 +97,8 @@ function NlsfbCard({
     .filter((item) => item !== "");
 
   return (
-    <Card
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      w="500"
-      withBorder
-      onClick={handleClick}
-      style={{ cursor: "pointer", textAlign: "left" }}
-    >
-      <Card.Section>
+    <Card shadow="sm" padding="lg" radius="md" w="500" withBorder>
+      <Card.Section onClick={handleClick} style={{ cursor: "pointer" }}>
         <svg
           width="100%"
           height="100%"
@@ -161,20 +163,20 @@ function NlsfbCard({
           </Text>
           <ul>
             {reverseRelations.length > 0 ? (
-              reverseRelations.map((item) => (
-                <li
-                  key={item.classUri}
-                  onClick={handleBsddBadgeClick}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Anchor
-                    href={`https://search.bsdd.buildingsmart.org/ext/class?uri=${item.classUri}`}
-                    target="_blank"
-                  >
-                    {item.className}
-                  </Anchor>
-                </li>
-              ))
+              reverseRelations.map(
+                (item) => (
+                  (
+                    <li key={item.classUri} style={{ cursor: "pointer" }}>
+                      <Anchor
+                        href={getSearchUrl(item.classUri)}
+                        target="_blank"
+                      >
+                        {item.className}
+                      </Anchor>
+                    </li>
+                  )
+                )
+              )
             ) : (
               <li>-</li>
             )}
