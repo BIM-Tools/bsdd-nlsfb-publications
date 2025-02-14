@@ -8,6 +8,8 @@ import {
   Breadcrumbs,
   Anchor,
   Title,
+  Loader,
+  Center,
 } from "@mantine/core";
 import DictionaryDropdown from "./features/DictionaryDropdown/DictionaryDropdown";
 
@@ -46,6 +48,9 @@ const fetchAllClasses = async (
       });
       offset += limit;
       hasMore = fetchedClasses.length === limit;
+      
+      // Limit to 6 calls per second
+      await new Promise((resolve) => setTimeout(resolve, 200));
     } catch (error) {
       console.error("Error fetching classes:", error);
       hasMore = false;
@@ -67,9 +72,7 @@ function App() {
   const [activeLevels, setActiveLevels] = useState<string[]>([
     selectedDictionaryName,
   ]);
-  // const [activeClassNames, setActiveClassNames] = useState<Map<string, string>>(
-  //   new Map()
-  // );
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setActiveLevels([selectedDictionaryName]);
@@ -77,9 +80,11 @@ function App() {
 
   useEffect(() => {
     if (selectedDictionary) {
+      setLoading(true);
       fetchAllClasses(selectedDictionary, selectedDictionaryName).then(
         (classes) => {
           setClasses(classes);
+          setLoading(false);
         }
       );
     }
@@ -118,17 +123,23 @@ function App() {
         </Breadcrumbs>
         <Space h="md" />
         <Divider p="md" />
-        <Grid justify="center" align="stretch">
-          {activeItems.map((item) => (
-            <Grid.Col key={item.code} span="auto">
-              <NlsfbCard
-                nlsfbClass={item}
-                setActiveLevel={handleSetActiveLevel}
-                activeItems={activeItems}
-              />
-            </Grid.Col>
-          ))}
-        </Grid>
+        {loading ? (
+          <Center>
+            <Loader />
+          </Center>
+        ) : (
+          <Grid justify="center" align="stretch">
+            {activeItems.map((item) => (
+              <Grid.Col key={item.code} span="auto">
+                <NlsfbCard
+                  nlsfbClass={item}
+                  setActiveLevel={handleSetActiveLevel}
+                  activeItems={activeItems}
+                />
+              </Grid.Col>
+            ))}
+          </Grid>
+        )}
       </Container>
     </MantineProvider>
   );
