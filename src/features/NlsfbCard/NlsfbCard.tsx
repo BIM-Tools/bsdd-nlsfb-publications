@@ -10,7 +10,8 @@ import { extractNamePart } from "../../utils";
 interface HoofdstukProps {
   nlsfbClass: ClassListItemContractV1Classes;
   setActiveLevel: (value: string) => void;
-  activeItems: ClassListItemContractV1Classes[];
+  currentLevelItems: ClassListItemContractV1Classes[];
+  nextLevelItems: ClassListItemContractV1Classes[];
 }
 
 function getSearchUrl(classUrl: string) {
@@ -27,7 +28,8 @@ function getSearchUrl(classUrl: string) {
 function NlsfbCard({
   nlsfbClass,
   setActiveLevel,
-  activeItems,
+  currentLevelItems,
+  nextLevelItems,
 }: HoofdstukProps) {
   const [description, setDescription] = useState<string | null>(null);
   const [reverseRelations, setReverseRelations] = useState<
@@ -86,12 +88,23 @@ function NlsfbCard({
     window.open(encodeURIComponent(url), "_blank");
   };
 
-  const includeNames = activeItems
-    .filter((item) => item.code === nlsfbClass.code)
+  const includeNames = nextLevelItems
     .map((item) => extractNamePart(item.name))
     .filter((item) => item !== "");
 
-  const excludeNames = activeItems
+  const relatedItems = reverseRelations
+    ? reverseRelations.map((item) => ({
+        name: item.className,
+        uri: item.classUri,
+      }))
+    : [];
+
+  const mergedItems = [
+    ...includeNames.map((name) => ({ name, uri: null })),
+    ...relatedItems,
+  ];
+
+  const excludeNames = currentLevelItems
     .filter((item) => item.code !== nlsfbClass.code)
     .map((item) => extractNamePart(item.name))
     .filter((item) => item !== "");
@@ -125,7 +138,7 @@ function NlsfbCard({
             alignmentBaseline="middle"
             transform="rotate(-45, 100, 50)"
           >
-            {nlsfbClass.code}
+            ({nlsfbClass.code})
           </text>
         </svg>
       </Card.Section>
@@ -149,40 +162,22 @@ function NlsfbCard({
         Inbegrepen:
       </Text>
       <ul>
-        {includeNames.length > 0 ? (
-          includeNames.map((item) => <li key={item}>{item}</li>)
+        {mergedItems.length > 0 ? (
+          mergedItems.map((item, index) =>
+            item.uri ? (
+              <li key={index} style={{ cursor: "pointer" }}>
+                <Anchor href={getSearchUrl(item.uri)} target="_blank">
+                  {item.name}
+                </Anchor>
+              </li>
+            ) : (
+              <li key={index}>{item.name}</li>
+            )
+          )
         ) : (
           <li>-</li>
         )}
       </ul>
-
-      {reverseRelations && reverseRelations.length > 0 && (
-        <>
-          <Text fw={500} mt="md">
-            Gerelateerde bouwbegrippen:
-          </Text>
-          <ul>
-            {reverseRelations.length > 0 ? (
-              reverseRelations.map(
-                (item) => (
-                  (
-                    <li key={item.classUri} style={{ cursor: "pointer" }}>
-                      <Anchor
-                        href={getSearchUrl(item.classUri)}
-                        target="_blank"
-                      >
-                        {item.className}
-                      </Anchor>
-                    </li>
-                  )
-                )
-              )
-            ) : (
-              <li>-</li>
-            )}
-          </ul>
-        </>
-      )}
 
       <Text fw={500} mt="md">
         Uitgezonderd:

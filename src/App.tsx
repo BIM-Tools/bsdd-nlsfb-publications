@@ -48,7 +48,7 @@ const fetchAllClasses = async (
       });
       offset += limit;
       hasMore = fetchedClasses.length === limit;
-      
+
       // Limit to 6 calls per second
       await new Promise((resolve) => setTimeout(resolve, 200));
     } catch (error) {
@@ -101,7 +101,7 @@ function App() {
   };
 
   const currentLevel = activeLevels[activeLevels.length - 1];
-  const activeItems = classes.get(currentLevel) || [];
+  const currentLevelItems = classes.get(currentLevel) || [];
 
   return (
     <MantineProvider>
@@ -129,12 +129,13 @@ function App() {
           </Center>
         ) : (
           <Grid justify="center" align="stretch">
-            {activeItems.map((item) => (
+            {currentLevelItems.map((item) => (
               <Grid.Col key={item.code} span="auto">
                 <NlsfbCard
                   nlsfbClass={item}
                   setActiveLevel={handleSetActiveLevel}
-                  activeItems={activeItems}
+                  currentLevelItems={currentLevelItems}
+                  nextLevelItems={classes.get(item.code as string) || []}
                 />
               </Grid.Col>
             ))}
