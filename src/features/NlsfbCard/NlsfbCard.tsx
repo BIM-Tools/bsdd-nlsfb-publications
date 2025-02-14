@@ -85,7 +85,7 @@ function NlsfbCard({
     if (!url) {
       return;
     }
-    window.open(encodeURIComponent(url), "_blank");
+    window.open(url, "_blank");
   };
 
   const includeNames = nextLevelItems
