@@ -20,8 +20,10 @@ interface DictionaryDropdownProps {
   setSelectedDictionaryName: (value: string) => void;
 }
 
-// const BASE_URI = "https://identifier.buildingsmart.org/uri/nlsfb/";
-const BASE_URI = "https://data.ketenstandaard.nl/publications/nlsfb/";
+const BASE_URIS = [
+  "https://data.ketenstandaard.nl/publications/nlsfb/",
+  "https://identifier.buildingsmart.org/uri/nlsfb/",
+];
 
 function DictionaryDropdown({
   selectedDictionary,
@@ -37,38 +39,44 @@ function DictionaryDropdown({
   useEffect(() => {
     const fetchDictionaries = async () => {
       const apiClient = new BsddApiBase();
-      try {
-        const response = await apiClient.api.dictionaryGet({
-          Uri: BASE_URI,
-        });
-        const dictionaries = response.data.dictionaries || [];
-        const formattedOptions = dictionaries.map((dict: any) => ({
-          value: dict.uri,
-          label: dict.name,
-        }));
-        const dictionaryMap = new Map<string, Dictionary>();
-        dictionaries.forEach((dict: any) => {
-          dictionaryMap.set(dict.uri, {
-            uri: dict.uri,
-            name: dict.name,
-            organizationCodeOwner: dict.organizationCodeOwner,
-            version: dict.version,
+      const allDictionaries: Dictionary[] = [];
+
+      for (const baseUri of BASE_URIS) {
+        try {
+          const response = await apiClient.api.dictionaryGet({
+            Uri: baseUri,
           });
-        });
-        setOptions(formattedOptions);
-        setDictionaries(dictionaryMap);
-        if (formattedOptions.length > 0) {
-          setSelectedDictionary(formattedOptions[0].value);
-          const firstDict = dictionaryMap.get(formattedOptions[0].value);
-          if (firstDict) {
-            setSelectedDictionaryName(firstDict.name);
-          }
+          const dictionaries = response.data.dictionaries || [];
+          allDictionaries.push(...dictionaries);
+        } catch (error) {
+          console.error(`Error fetching dictionaries from ${baseUri}:`, error);
         }
-      } catch (error) {
-        console.error("Error fetching dictionaries:", error);
-      } finally {
-        setLoading(false);
       }
+
+      const formattedOptions = allDictionaries.map((dict: any) => ({
+        value: dict.uri,
+        label: dict.name,
+      }));
+      const dictionaryMap = new Map<string, Dictionary>();
+      allDictionaries.forEach((dict: any) => {
+        dictionaryMap.set(dict.uri, {
+          uri: dict.uri,
+          name: dict.name,
+          organizationCodeOwner: dict.organizationCodeOwner,
+          version: dict.version,
+        });
+      });
+
+      setOptions(formattedOptions);
+      setDictionaries(dictionaryMap);
+      if (formattedOptions.length > 0) {
+        setSelectedDictionary(formattedOptions[0].value);
+        const firstDict = dictionaryMap.get(formattedOptions[0].value);
+        if (firstDict) {
+          setSelectedDictionaryName(firstDict.name);
+        }
+      }
+      setLoading(false);
     };
 
     fetchDictionaries();
