@@ -2,6 +2,8 @@
 
 This project is a React application that displays NL-SfB publications using the buildingSMART Data Dictionary (bSDD). It allows users to select different dictionaries and view related class details and reverse relations.
 
+## [Live demo](https://bim-tools.github.io/bsdd-nlsfb-publications/main/index.html)
+
 ## Features
 
 - Select and view different dictionaries from bSDD.
