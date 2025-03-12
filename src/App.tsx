@@ -15,25 +15,22 @@ import DictionaryDropdown from "./features/DictionaryDropdown/DictionaryDropdown
 
 import "./App.css";
 import NlsfbCard from "./features/NlsfbCard/NlsfbCard";
-import {
-  BsddApiBase,
-  ClassListItemContractV1Classes,
-} from "./BsddApi/BsddApiBase";
+import { ClassListItemContractV1Classes } from "./BsddApi/BsddApiBase";
 import { useEffect, useState } from "react";
+import { dictionaryClassesGetWithClasses } from "./BsddApi";
 
 const fetchAllClasses = async (
   dictionaryUri: string,
   selectedDictionaryName: string
 ) => {
-  const apiClient = new BsddApiBase();
   const allClasses = new Map<string, ClassListItemContractV1Classes[]>();
   let offset = 0;
-  const limit = 100;
+  const limit = 1000;
   let hasMore = true;
 
   while (hasMore) {
     try {
-      const response = await apiClient.api.dictionaryClassesGetWithClasses({
+      const response = await dictionaryClassesGetWithClasses({
         Uri: dictionaryUri,
         Offset: offset,
         Limit: limit,
@@ -48,9 +45,6 @@ const fetchAllClasses = async (
       });
       offset += limit;
       hasMore = fetchedClasses.length === limit;
-
-      // Limit to 6 calls per second
-      await new Promise((resolve) => setTimeout(resolve, 200));
     } catch (error) {
       console.error("Error fetching classes:", error);
       hasMore = false;

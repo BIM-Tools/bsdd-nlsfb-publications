@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Select } from "@mantine/core";
-import { BsddApiBase } from "../../BsddApi/BsddApiBase";
+import { dictionaryGet } from "../../BsddApi";
 
 interface DictionaryOption {
   value: string;
@@ -21,6 +21,7 @@ interface DictionaryDropdownProps {
 }
 
 const BASE_URIS = [
+  "https://data.ketenstandaard.nl/publications/nlsfb-demo/2024",
   "https://data.ketenstandaard.nl/publications/nlsfb/",
   "https://identifier.buildingsmart.org/uri/nlsfb/",
 ];
@@ -38,12 +39,11 @@ function DictionaryDropdown({
 
   useEffect(() => {
     const fetchDictionaries = async () => {
-      const apiClient = new BsddApiBase();
       const allDictionaries: Dictionary[] = [];
 
       for (const baseUri of BASE_URIS) {
         try {
-          const response = await apiClient.api.dictionaryGet({
+          const response = await dictionaryGet({
             Uri: baseUri,
           });
           const dictionaries = response.data.dictionaries || [];
@@ -55,7 +55,7 @@ function DictionaryDropdown({
 
       const formattedOptions = allDictionaries.map((dict: any) => ({
         value: dict.uri,
-        label: dict.name,
+        label: `${dict.name} (${dict.version})`,
       }));
       const dictionaryMap = new Map<string, Dictionary>();
       allDictionaries.forEach((dict: any) => {

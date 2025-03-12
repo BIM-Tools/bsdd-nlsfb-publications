@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Card, Text, Group, Badge, Anchor } from "@mantine/core";
 import {
   ClassListItemContractV1Classes,
-  BsddApiBase,
   ClassReverseRelationContractV1,
 } from "../../BsddApi/BsddApiBase";
 import { extractNamePart } from "../../utils";
+import { classGet } from "../../BsddApi";
 
 interface HoofdstukProps {
   nlsfbClass: ClassListItemContractV1Classes;
@@ -42,9 +42,8 @@ function NlsfbCard({
       if (!uri) {
         return;
       }
-      const apiClient = new BsddApiBase();
       try {
-        const response = await apiClient.api.classGet({
+        const response = await classGet({
           Uri: uri,
           IncludeReverseRelations: true,
           ReverseRelationDictionaryUris: [
