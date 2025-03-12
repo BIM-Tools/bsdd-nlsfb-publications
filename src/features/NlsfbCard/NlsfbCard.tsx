@@ -109,7 +109,7 @@ function NlsfbCard({
     .filter((item) => item !== "");
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" w="500" withBorder>
+    <Card shadow="sm" padding="lg" radius="md"  withBorder>
       <Card.Section onClick={handleClick} style={{ cursor: "pointer" }}>
         <svg
           width="100%"

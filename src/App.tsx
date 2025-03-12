@@ -116,24 +116,23 @@ function App() {
           ))}
         </Breadcrumbs>
         <Space h="md" />
-        <Divider p="md" />
         {loading ? (
           <Center>
             <Loader />
           </Center>
         ) : (
-          <Grid justify="center" align="stretch">
+            <Grid justify="center" align="stretch">
             {currentLevelItems.map((item) => (
-              <Grid.Col key={item.code} span="auto">
-                <NlsfbCard
-                  nlsfbClass={item}
-                  setActiveLevel={handleSetActiveLevel}
-                  currentLevelItems={currentLevelItems}
-                  nextLevelItems={classes.get(item.code as string) || []}
-                />
+              <Grid.Col key={item.code} span={6}>
+              <NlsfbCard
+                nlsfbClass={item}
+                setActiveLevel={handleSetActiveLevel}
+                currentLevelItems={currentLevelItems}
+                nextLevelItems={classes.get(item.code as string) || []}
+              />
               </Grid.Col>
             ))}
-          </Grid>
+            </Grid>
         )}
       </Container>
     </MantineProvider>
