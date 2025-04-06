@@ -13,8 +13,11 @@
   "dependencies": {
     "@mantine/core": "^7.16.3",
     "@mantine/hooks": "^7.16.3",
+    "i18next": "^24.2.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-i18next": "^15.4.1",
+    "react-world-flags": "^1.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

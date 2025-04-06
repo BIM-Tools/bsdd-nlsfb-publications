@@ -3,7 +3,6 @@ import {
   MantineProvider,
   Container,
   Grid,
-  Divider,
   Space,
   Breadcrumbs,
   Anchor,
@@ -12,6 +11,9 @@ import {
   Center,
 } from "@mantine/core";
 import DictionaryDropdown from "./features/DictionaryDropdown/DictionaryDropdown";
+import { useTranslation } from "react-i18next";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./i18n";
 
 import "./App.css";
 import NlsfbCard from "./features/NlsfbCard/NlsfbCard";
@@ -21,7 +23,8 @@ import { dictionaryClassesGetWithClasses } from "./BsddApi";
 
 const fetchAllClasses = async (
   dictionaryUri: string,
-  selectedDictionaryName: string
+  selectedDictionaryName: string,
+  languageCode: string = "nl-NL"
 ) => {
   const allClasses = new Map<string, ClassListItemContractV1Classes[]>();
   let offset = 0;
@@ -34,6 +37,7 @@ const fetchAllClasses = async (
         Uri: dictionaryUri,
         Offset: offset,
         Limit: limit,
+        languageCode,
       });
       const fetchedClasses = response.data.classes || [];
       fetchedClasses.forEach((cls) => {
@@ -55,6 +59,7 @@ const fetchAllClasses = async (
 };
 
 function App() {
+  const { t } = useTranslation();
   const [selectedDictionary, setSelectedDictionary] = useState<string | null>(
     null
   );
@@ -67,22 +72,27 @@ function App() {
     selectedDictionaryName,
   ]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [language, setLanguage] = useState<string>("nl-NL");
 
   useEffect(() => {
     setActiveLevels([selectedDictionaryName]);
   }, [selectedDictionaryName]);
 
   useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language]);
+
+  useEffect(() => {
     if (selectedDictionary) {
       setLoading(true);
-      fetchAllClasses(selectedDictionary, selectedDictionaryName).then(
+      fetchAllClasses(selectedDictionary, selectedDictionaryName, language).then(
         (classes) => {
           setClasses(classes);
           setLoading(false);
         }
       );
     }
-  }, [selectedDictionary]);
+  }, [language, selectedDictionary]);
 
   const handleSetActiveLevel = (level: string) => {
     if (classes.has(level) && classes.get(level)?.length !== 0) {
@@ -98,44 +108,60 @@ function App() {
   const currentLevelItems = classes.get(currentLevel) || [];
 
   return (
-    <MantineProvider>
-      <Container fluid w="100vw" h="100vh" style={{ textAlign: "left" }}>
-        <Title>NL-SfB publicaties op bSDD</Title>
-        <Space h="md" />
-        <DictionaryDropdown
-          selectedDictionary={selectedDictionary}
-          setSelectedDictionary={setSelectedDictionary}
-          setSelectedDictionaryName={setSelectedDictionaryName}
-        />
-        <Space h="md" />
-        <Breadcrumbs>
-          {activeLevels.slice(0, -1).map((level, index) => (
-            <Anchor key={level} onClick={() => handleBreadcrumbClick(index)}>
-              {level}
-            </Anchor>
-          ))}
-        </Breadcrumbs>
-        <Space h="md" />
-        {loading ? (
-          <Center>
-            <Loader />
-          </Center>
-        ) : (
-            <Grid justify="center" align="stretch">
-            {currentLevelItems.map((item) => (
-              <Grid.Col key={item.code} span={6}>
-              <NlsfbCard
-                nlsfbClass={item}
-                setActiveLevel={handleSetActiveLevel}
-                currentLevelItems={currentLevelItems}
-                nextLevelItems={classes.get(item.code as string) || []}
-              />
-              </Grid.Col>
+    <I18nextProvider i18n={i18n}>
+      <MantineProvider>
+        <Container
+          fluid
+          style={{
+            backgroundColor: "white",
+            color: "black",
+            maxWidth: "1280px",
+            width: "100%",
+            marginTop: "1rem",
+            padding: "3rem",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Title>{t("app.title")}</Title>
+          <Space h="md" />
+          <DictionaryDropdown
+            selectedDictionary={selectedDictionary}
+            setSelectedDictionary={setSelectedDictionary}
+            setSelectedDictionaryName={setSelectedDictionaryName}
+            language={language}
+            setLanguage={setLanguage}
+          />
+          <Space h="md" />
+          <Breadcrumbs>
+            {activeLevels.map((level, index) => (
+              <Anchor key={level} onClick={() => handleBreadcrumbClick(index)}>
+                {level}
+              </Anchor>
             ))}
+          </Breadcrumbs>
+          <Space h="md" />
+          {loading ? (
+            <Center>
+              <Loader />
+            </Center>
+          ) : (
+            <Grid justify="center" align="stretch">
+              {currentLevelItems.map((item) => (
+                <Grid.Col key={item.code} span={6}>
+                  <NlsfbCard
+                    nlsfbClass={item}
+                    setActiveLevel={handleSetActiveLevel}
+                    currentLevelItems={currentLevelItems}
+                    nextLevelItems={classes.get(item.code as string) || []}
+                    languageCode={language}
+                  />
+                </Grid.Col>
+              ))}
             </Grid>
-        )}
-      </Container>
-    </MantineProvider>
+          )}
+        </Container>
+      </MantineProvider>
+    </I18nextProvider>
   );
 }
 

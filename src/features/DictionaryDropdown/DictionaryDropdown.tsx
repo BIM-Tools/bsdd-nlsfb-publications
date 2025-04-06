@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Select } from "@mantine/core";
+import { Select, Grid } from "@mantine/core";
 import { dictionaryGet } from "../../BsddApi";
+import { LanguagePicker } from "../LanguagePicker/LanguagePicker";
 
 interface DictionaryOption {
   value: string;
@@ -18,6 +19,8 @@ interface DictionaryDropdownProps {
   selectedDictionary: string | null;
   setSelectedDictionary: (value: string | null) => void;
   setSelectedDictionaryName: (value: string) => void;
+  language: string;
+  setLanguage: (value: string) => void;
 }
 
 const BASE_URIS = [
@@ -30,6 +33,8 @@ function DictionaryDropdown({
   selectedDictionary,
   setSelectedDictionary,
   setSelectedDictionaryName,
+  language,
+  setLanguage,
 }: DictionaryDropdownProps) {
   const [options, setOptions] = useState<DictionaryOption[]>([]);
   const [dictionaries, setDictionaries] = useState<Map<string, Dictionary>>(
@@ -82,7 +87,7 @@ function DictionaryDropdown({
     fetchDictionaries();
   }, []);
 
-  const handleChange = (value: string | null) => {
+  const handleDictionaryChange = (value: string | null) => {
     setSelectedDictionary(value);
     const selectedDict = dictionaries.get(value || "");
     if (selectedDict) {
@@ -91,14 +96,23 @@ function DictionaryDropdown({
   };
 
   return (
-    <Select
-      label="Selecteer versie:"
-      placeholder="Choose a dictionary"
-      data={options}
-      value={selectedDictionary}
-      onChange={handleChange}
-      disabled={loading}
-    />
+    <Grid>
+      <Grid.Col span={8}>
+        <Select
+          placeholder="Choose a dictionary"
+          data={options}
+          value={selectedDictionary}
+          onChange={handleDictionaryChange}
+          disabled={loading}
+        />
+      </Grid.Col>
+      <Grid.Col span={4}>
+        <LanguagePicker
+          selectedLanguage={language}
+          setSelectedLanguage={setLanguage}
+        />
+      </Grid.Col>
+    </Grid>
   );
 }
 

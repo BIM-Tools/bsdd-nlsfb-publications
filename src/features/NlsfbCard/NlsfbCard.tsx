@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { Card, Text, Group, Badge, Anchor } from "@mantine/core";
+import { Card, Text, Group, Badge, Anchor, Box } from "@mantine/core";
 import {
   ClassListItemContractV1Classes,
   ClassReverseRelationContractV1,
 } from "../../BsddApi/BsddApiBase";
 import { extractNamePart } from "../../utils";
 import { classGet } from "../../BsddApi";
+import { useTranslation } from "react-i18next";
 
 interface HoofdstukProps {
   nlsfbClass: ClassListItemContractV1Classes;
   setActiveLevel: (value: string) => void;
   currentLevelItems: ClassListItemContractV1Classes[];
   nextLevelItems: ClassListItemContractV1Classes[];
+  languageCode: string;
 }
 
 function getSearchUrl(classUrl: string) {
@@ -30,7 +32,9 @@ function NlsfbCard({
   setActiveLevel,
   currentLevelItems,
   nextLevelItems,
+  languageCode
 }: HoofdstukProps) {
+  const { t } = useTranslation();
   const [description, setDescription] = useState<string | null>(null);
   const [reverseRelations, setReverseRelations] = useState<
     ClassReverseRelationContractV1[] | null
@@ -49,6 +53,7 @@ function NlsfbCard({
           ReverseRelationDictionaryUris: [
             "https://identifier.buildingsmart.org/uri/volkerwesselsbvgo/basis_bouwproducten_oene/0.1",
           ],
+          languageCode
         });
         setDescription(response.data.definition || null);
         setReverseRelations(response.data.reverseClassRelations || null);
@@ -109,37 +114,62 @@ function NlsfbCard({
     .filter((item) => item !== "");
 
   return (
-    <Card shadow="sm" padding="lg" radius="md"  withBorder>
+    <Card
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+    >
       <Card.Section onClick={handleClick} style={{ cursor: "pointer" }}>
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 200 100"
-          xmlns="http://www.w3.org/2000/svg"
+        <Box
+          style={{
+            cursor: "pointer",
+            border: "1px solid black",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            overflow: "hidden",
+            width: "160px",
+            height: "160px",
+            margin: "10px auto",
+          }}
         >
-          <rect width="100%" height="100%" fill="white" />
-          <rect
-            x="60"
-            y="10"
-            width="80"
-            height="80"
-            fill="none"
-            stroke="black"
-            strokeWidth="2"
-          />
-          <text
-            x="50%"
-            y="50%"
-            fontSize="18"
-            fontFamily="Arial, sans-serif"
-            fill="black"
-            textAnchor="middle"
-            alignmentBaseline="middle"
-            transform="rotate(-45, 100, 50)"
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            ({nlsfbClass.code})
-          </text>
-        </svg>
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stopColor="lightgrey" />
+                <stop offset="50%" stopColor="white" />
+              </linearGradient>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#gradient)" />
+            <rect
+              x="25%"
+              y="25%"
+              width="50%"
+              height="50%"
+              fill="white"
+              stroke="black"
+              strokeWidth="0.5"
+            />
+            <text
+              x="50%"
+              y="50%"
+              fontSize="12"
+              fontFamily="Arial, sans-serif"
+              fill="black"
+              textAnchor="middle"
+              alignmentBaseline="middle"
+              fontWeight="bold"
+              transform="rotate(-45, 50, 50)"
+            >
+              ({nlsfbClass.code})
+            </text>
+          </svg>
+        </Box>
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
@@ -149,7 +179,7 @@ function NlsfbCard({
       {description && (
         <>
           <Text fw={500} mt="md">
-            Omschrijving:
+            {t("card.description")}:
           </Text>
           <Text size="sm" c="dimmed" style={{ whiteSpace: "pre-wrap" }}>
             {description}
@@ -158,7 +188,7 @@ function NlsfbCard({
       )}
 
       <Text fw={500} mt="md">
-        Inbegrepen:
+        {t("card.included")}:
       </Text>
       <ul>
         {mergedItems.length > 0 ? (
@@ -179,7 +209,7 @@ function NlsfbCard({
       </ul>
 
       <Text fw={500} mt="md">
-        Uitgezonderd:
+        {t("card.excluded")}:
       </Text>
       <ul>
         {excludeNames.length > 0 ? (
@@ -190,7 +220,7 @@ function NlsfbCard({
       </ul>
       <Group m="xs">
         <Badge onClick={handleBadgeClick} style={{ cursor: "pointer" }}>
-          Bron
+          {t("card.source")}
         </Badge>
         <Badge onClick={handleBsddBadgeClick} style={{ cursor: "pointer" }}>
           bSDD
