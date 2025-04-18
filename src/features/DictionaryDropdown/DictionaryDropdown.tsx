@@ -24,7 +24,7 @@ interface DictionaryDropdownProps {
 }
 
 const BASE_URIS = [
-  "https://data.ketenstandaard.nl/publications/nlsfb-demo/2024",
+  "https://data.ketenstandaard.nl/publications/nlsfb-demo/2025",
   "https://data.ketenstandaard.nl/publications/nlsfb/",
   "https://identifier.buildingsmart.org/uri/nlsfb/",
 ];
