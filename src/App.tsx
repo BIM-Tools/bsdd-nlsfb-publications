@@ -145,9 +145,13 @@ function App() {
               <Loader />
             </Center>
           ) : (
-            <Grid justify="center" align="stretch">
+        <Grid justify="left" align="start">
               {currentLevelItems.map((item) => (
-                <Grid.Col key={item.code} span={6}>
+                <Grid.Col
+                  key={item.code}
+                  span={{ xs: 12, sm: 6 }} // Use the span prop with breakpoint object
+
+                >
                   <NlsfbCard
                     nlsfbClass={item}
                     setActiveLevel={handleSetActiveLevel}
