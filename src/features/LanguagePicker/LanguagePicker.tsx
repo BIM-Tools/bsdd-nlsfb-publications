@@ -1,11 +1,10 @@
 import { Combobox, Input, InputBase, useCombobox } from "@mantine/core";
-import  Flag  from "react-world-flags";
-
+import Flag from "react-world-flags";
 
 const data = [
   { label: "Nederlands", code: "nl-NL", flagCode: "NL" },
   { label: "Français", code: "fr-BE", flagCode: "FR" },
-  { label: "English", code: "en-GB" , flagCode: "GB" },  
+  { label: "English", code: "en-GB", flagCode: "GB" },
 ];
 
 const dataMap = Object.fromEntries(data.map((item) => [item.code, item]));
@@ -23,7 +22,6 @@ export function LanguagePicker({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-
   const options = data.map((item) => (
     <Combobox.Option value={item.code} key={item.code}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -37,7 +35,7 @@ export function LanguagePicker({
     <Combobox
       store={combobox}
       onOptionSubmit={(code) => {
-        setSelectedLanguage(code);  
+        setSelectedLanguage(code);
         combobox.closeDropdown();
       }}
     >
@@ -49,8 +47,23 @@ export function LanguagePicker({
           rightSection={<Combobox.Chevron />}
           rightSectionPointerEvents="none"
           onClick={() => combobox.toggleDropdown()}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            overflow: "hidden", // Prevent overflow
+          }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              overflow: "hidden", // Prevent overflow
+              whiteSpace: "nowrap", // Prevent wrapping
+              textOverflow: "ellipsis", // Add ellipsis for overflowed text
+            }}
+          >
             <Flag
               code={dataMap[selectedLanguage]?.flagCode || ""}
               style={{ width: 22, height: 22 }}
