@@ -178,10 +178,7 @@ function NlsfbCard({
 
       {description && (
         <>
-          <Text fw={500} mt="md">
-            {t("card.description")}:
-          </Text>
-          <Text size="sm" c="dimmed" style={{ whiteSpace: "pre-wrap" }}>
+          <Text style={{ whiteSpace: "pre-wrap" }}>
             {description}
           </Text>
         </>
